@@ -1,0 +1,50 @@
+colour.black=Black
+colour.red=Red
+colour.green=Green
+colour.brown=Brown
+colour.blue=Blue
+colour.purple=Purple
+colour.cyan=Cyan
+colour.silver=Silver
+colour.grey=Grey
+colour.pink=Pink
+colour.lime=Lime
+colour.yellow=Yellow
+colour.lightblue=Light Blue
+color.magenta=Magenta
+colour.orange=Orange
+colour.white=White
+
+tile.banner.black.name=Black Banner
+tile.banner.red.name=Red Banner
+tile.banner.green.name=Green Banner
+tile.banner.brown.name=Brown Banner
+tile.banner.blue.name=Blue Banner
+tile.banner.purple.name=Purple Banner
+tile.banner.cyan.name=Cyan Banner
+tile.banner.silver.name=Silver Banner
+tile.banner.grey.name=Grey Banner
+tile.banner.pink.name=Pink Banner
+tile.banner.lime.name=Lime Banner
+tile.banner.yellow.name=Yellow Banner
+tile.banner.lightblue.name=Light Blue Banner
+tile.banner.magenta.name=Magenta Banner
+tile.banner.orange.name=Orange Banner
+tile.banner.white.name=White Banner
+
+tile.banner=Banner
+
+unit.melee1=Milita
+
+gui.spawn=Spawn
+gui.details=Details
+
+gui.options.skin=Skin
+gui.options.hair=Hair
+gui.options.eyes=Eyes
+gui.options.weapons=Weapon
+gui.options.shields=Shield
+gui.options.helmet=Helmet
+
+
+authors={nerd-boy}
