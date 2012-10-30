@@ -6,6 +6,7 @@ import java.util.Arrays;
 import mab.commander.block.TileEntityBanner;
 import mab.commander.npc.EntityMBMilitia;
 import mab.commander.npc.EntityMBUnit;
+import mab.commander.npc.EnumUnits;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.INetworkManager;
 import net.minecraft.src.MathHelper;
@@ -81,7 +82,7 @@ public static Packet250CustomPayload generateSpawnPacket(EntityMBUnit unit, int 
 		//17 - pitch
 		data[17] = (byte)((int)(unit.rotationPitch * 256.0F / 360.0F));
 		//18 - type
-		data[18] = (byte)unit.unitType.ordinal();
+		data[18] = (byte)unit.getUnitType().ordinal();
 		//19 - colour
 		data[19] = (byte)unit.getTeam().ordinal();
 		//20 - 26 options
@@ -95,7 +96,7 @@ public static Packet250CustomPayload generateSpawnPacket(EntityMBUnit unit, int 
 	public static EntityMBUnit readUnitFromPacket(Packet250CustomPayload p, World world){
 		if(p.channel.equals(spawnPacket)){
 			
-			EntityMBUnit unit = new EntityMBMilitia(world, EnumTeam.values()[p.data[19]]);
+			EntityMBUnit unit = EntityMBUnit.generateUnit(world, EnumTeam.values()[p.data[19]], EnumUnits.values()[p.data[18]]);
 			
 			
 			int x = readIntFromByteArray(p.data, 4);

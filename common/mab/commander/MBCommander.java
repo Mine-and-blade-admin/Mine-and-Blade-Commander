@@ -9,6 +9,7 @@ import net.minecraftforge.common.Configuration;
 import mab.commander.block.BlockBanner;
 import mab.commander.block.BlockItemBanner;
 import mab.commander.block.TileEntityBanner;
+import mab.commander.npc.EntityMBKnight;
 import mab.commander.npc.EntityMBMilitia;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -69,6 +70,8 @@ public class MBCommander {
 		NetworkRegistry.instance().registerGuiHandler(this, PROXY);
 		
 		EntityRegistry.registerModEntity(EntityMBMilitia.class, "MaBMilitia", 200,
+				this, 50, 50, false);
+		EntityRegistry.registerModEntity(EntityMBKnight.class, "MaBKnight", 202,
 				this, 50, 50, false);
 		
 		

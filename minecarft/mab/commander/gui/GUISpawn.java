@@ -25,8 +25,10 @@ import mab.commander.ConfigHelper;
 import mab.commander.EnumTeam;
 import mab.commander.MBCommander;
 import mab.commander.block.TileEntityBanner;
+import mab.commander.npc.EntityMBKnight;
 import mab.commander.npc.EntityMBMilitia;
 import mab.commander.npc.EntityMBUnit;
+import mab.commander.npc.EnumUnits;
 import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.FontRenderer;
@@ -51,7 +53,7 @@ public class GUISpawn extends GuiScreen{
 	protected int xSize = 220;
 
 	/** The Y size of the window in pixels. */
-	protected int ySize = 170;
+	protected int ySize = 186;
 	
 	/**
      * Starting X position for the Gui. Inconsistent use for Gui backgrounds.
@@ -94,10 +96,14 @@ public class GUISpawn extends GuiScreen{
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
         
-        spawnButton = new GUIAltButton(0, 115+guiLeft, 142+guiTop, 80, 18, st.translateKey("gui.spawn") );
+        spawnButton = new GUIAltButton(0, 115+guiLeft, 142+guiTop+16, 80, 18, st.translateKey("gui.spawn") );
     	detailsButton = new GUIAltButton(1, 115+guiLeft, 82+guiTop, 80, 18,  st.translateKey("gui.details"));
     	
-    	units = new EntityMBUnit[]{new EntityMBMilitia(mc.theWorld,banner.getTeam())};
+    	units = new EntityMBUnit[]{new EntityMBMilitia(mc.theWorld,banner.getTeam(), EnumUnits.Militia)
+    		, new EntityMBKnight(mc.theWorld,banner.getTeam(), EnumUnits.KnightShield)
+    		, new EntityMBKnight(mc.theWorld,banner.getTeam(), EnumUnits.KnightDuel)
+    		, new EntityMBKnight(mc.theWorld,banner.getTeam(), EnumUnits.KnightSpear)
+    	};
     	String[] unitLabels = new String[units.length];
     	for(int i = 0; i < units.length; i++){
     		unitLabels[i] =  st.translateKey(units[i].getUnitName());
@@ -128,7 +134,7 @@ public class GUISpawn extends GuiScreen{
 			
 			int count = 0;
 			for(int i = 0; i < 6; i++){
-				if(units[radioButtons.selected].getOptionMax(i) >= 0)
+				if(units[radioButtons.selected].getOptionMax(i) > 0)
 					count++;
 			}
 			scrolls = new GUIAltScroll[count];
@@ -140,6 +146,7 @@ public class GUISpawn extends GuiScreen{
 				}
 				else
 					scrolls[i].current = 0;
+				
 				scrolls[i].sliderValue = (float)scrolls[i].current / (float)units[radioButtons.selected].getOptionMax(i);
 				
 				scrolls[i].displayString = units[radioButtons.selected].getOptionLabel(i);

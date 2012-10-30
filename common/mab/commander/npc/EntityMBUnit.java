@@ -1,5 +1,6 @@
 package mab.commander.npc;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,19 +15,17 @@ import net.minecraft.src.World;
 
 public abstract class EntityMBUnit extends EntityLiving{
 	
-	public EnumUnits unitType;
-	
 	public boolean renderShadow = true;
 	
 	private int weaponDrawTimer;
 	
 	
-	public EntityMBUnit(World par1World, EnumTeam team) {
+	public EntityMBUnit(World par1World, EnumTeam team, EnumUnits type) {
 		super(par1World);
 		
 		weaponDrawTimer = 20*30; //30 seconds
 		dataWatcher.addObject(16, (byte)team.ordinal());
-		dataWatcher.addObject(17, 0);
+		dataWatcher.addObject(17, (byte)type.ordinal());
 	}
 	
 	@Override
@@ -75,7 +74,7 @@ public abstract class EntityMBUnit extends EntityLiving{
 	
 	
 	public String getUnitName(){
-		return unitType.getName();
+		return EnumUnits.values()[dataWatcher.getWatchableObjectByte(17)].getName();
 	}
 	
 
@@ -84,7 +83,7 @@ public abstract class EntityMBUnit extends EntityLiving{
 		super.writeEntityToNBT(par1nbtTagCompound);
 
 		par1nbtTagCompound.setByte("team", dataWatcher.getWatchableObjectByte(16));
-		par1nbtTagCompound.setByte("unit", (byte)unitType.ordinal());
+		par1nbtTagCompound.setByte("unit", dataWatcher.getWatchableObjectByte(17));
 		for(int i = 0; i < 6; i++){
 			par1nbtTagCompound.setByte("Option"+i, getOption(i));
 		}
@@ -97,49 +96,22 @@ public abstract class EntityMBUnit extends EntityLiving{
 		super.readEntityFromNBT(par1nbtTagCompound);
 		
 		dataWatcher.updateObject(16, par1nbtTagCompound.getByte("team"));
-		unitType = EnumUnits.values()[par1nbtTagCompound.getByte("unit")];
+		dataWatcher.updateObject(17, par1nbtTagCompound.getByte("unit"));
 		for(int i = 0; i < 6; i++){
 			setOption(i, par1nbtTagCompound.getByte("Option"+i));
 		}
 	}
 	
-	public byte getOptionMax(int option){
-		switch(option){
-		case 0:
-			return 4;
-		case 1:
-			return 5;
-		case 2:
-			return 5;
-		default:
-			return -1;
-		}
+	public final byte getOptionMax(int option){
+		return (byte)EnumUnits.values()[dataWatcher.getWatchableObjectByte(17)].getOptionMax()[option];
 	}
 	
-	public String getOptionLabel(int option){
-		switch(option){
-		case 0:
-			return "gui.options.skin";
-		case 1:
-			return "gui.options.hair";
-		case 2:
-			return "gui.options.eyes";
-		default:
-			return "";
-		}
+	public final String getOptionLabel(int option){
+		return EnumUnits.labels[option];
 	}
 	
-	public int getOptionIcon(int option){
-		switch(option){
-		case 0:
-			return 2;
-		case 1:
-			return 0;
-		case 2:
-			return 1;
-		default:
-			return -1;
-		}
+	public final int getOptionIcon(int option){
+		return EnumUnits.values()[dataWatcher.getWatchableObjectByte(17)].getOptionIcons()[option];
 	}
 	
 	public byte getOption(int option){
@@ -150,8 +122,8 @@ public abstract class EntityMBUnit extends EntityLiving{
 		return EnumTeam.values()[dataWatcher.getWatchableObjectByte(16)];
 	}
 	
-	public byte getSubType(){
-		return dataWatcher.getWatchableObjectByte(17);
+	public EnumUnits getUnitType(){
+		return EnumUnits.values()[dataWatcher.getWatchableObjectByte(17)];
 	}
 
 	public void setOption(int option, byte value){
@@ -182,6 +154,35 @@ public abstract class EntityMBUnit extends EntityLiving{
 	public abstract EnumUnitItems getWeaponOption();
 	
 	public abstract EnumUnitItems getWeaponOffHandOption();
+	
+	public abstract int getHelmNumber();
+	
+	
+	public static EntityMBUnit generateUnit(World world, EnumTeam team, EnumUnits unit){
+		try {
+			return (EntityMBUnit) unit.getUnitClass().getConstructor(World.class, EnumTeam.class, EnumUnits.class)
+				.newInstance(world, team, unit);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	
 }

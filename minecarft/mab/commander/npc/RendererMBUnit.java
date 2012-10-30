@@ -47,6 +47,7 @@ public class RendererMBUnit extends RenderBiped{
 			this.modelBipedMain.heldItemLeft = 0;
 			this.modelBody.heldItemLeft = 0;
 		}
+		this.modelBipedMain.bipedHeadwear.showModel = unit.getHelmNumber() > -1;
 			
 		super.doRenderLiving(unit, par2, par4, par6, par8, par9);
 			 

@@ -24,13 +24,19 @@ public class RadioButtonControl extends GuiButton{
 		}
 		
 		this.height = 12*options.length;
+		System.out.println(height);
 		this.width = max + 14;
 		this.options = options;
 	}
 	
 	public RadioButtonControl(int id, int xPos, int yPos, int width, int height,String[] options) {
 		super(id, xPos, yPos, width, height, "");
+		
+		
+		
+		this.height = 12*options.length;
 		this.options = options;
+		
 	}
 	
 	/**
@@ -78,7 +84,8 @@ public class RadioButtonControl extends GuiButton{
     				mouseX < this.xPosition + this.width && 
     				mouseY < this.yPosition + this.height ){
     			
-    			return (mouseY-this.yPosition)*options.length / this.height;
+    			System.out.println(mouseY-this.yPosition);
+    			return (mouseY-this.yPosition) / 12;
     			
     		}else
     			return -1;

@@ -21,12 +21,11 @@ public class EntityMBMilitia extends EntityMBUnit{
 
 	
 	public EntityMBMilitia(World par1World) {
-		this(par1World, EnumTeam.values()[par1World.rand.nextInt(16)]);
+		this(par1World, EnumTeam.values()[par1World.rand.nextInt(16)], EnumUnits.Militia);
 	}
 	
-	public EntityMBMilitia(World par1World, EnumTeam colour) {
-		super(par1World, colour);
-		unitType = EnumUnits.Militia;
+	public EntityMBMilitia(World par1World, EnumTeam colour, EnumUnits unit) {
+		super(par1World, colour, unit);
 	}
 
 	@Override
@@ -35,30 +34,6 @@ public class EntityMBMilitia extends EntityMBUnit{
 		return MBCommander.IMAGE_FOLDER+"skins/units/milita/Militia-"+getTeam().ordinal()+".png";
 	}
 	
-	@Override
-	public byte getOptionMax(int option) {
-		if(option == 3)
-			return 6;
-		else
-			return super.getOptionMax(option);
-	}
-	
-	
-
-	@Override
-	public String getOptionLabel(int option) {
-		if(option == 3)
-			return "gui.options.weapons";
-		else
-			return super.getOptionLabel(option);
-	}
-	
-	public int getOptionIcon(int option){
-		if(option == 3)
-			return 3;
-		else
-			return super.getOptionIcon(option);
-	}
 
 	@Override
 	public int getAttackStrength() {
@@ -95,6 +70,11 @@ public class EntityMBMilitia extends EntityMBUnit{
 	@Override
 	public EnumUnitItems getWeaponOffHandOption() {
 		return null;
+	}
+
+	@Override
+	public int getHelmNumber() {
+		return -1;
 	}
 	
 	
