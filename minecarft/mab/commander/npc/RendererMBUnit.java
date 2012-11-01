@@ -9,11 +9,13 @@ import mab.commander.utils.MBClientHelper;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.FontRenderer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemArmor;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.ModelBiped;
 import net.minecraft.src.RenderBiped;
+import net.minecraft.src.Tessellator;
 import net.minecraftforge.client.ForgeHooksClient;
 
 public class RendererMBUnit extends RenderBiped{
@@ -26,9 +28,8 @@ public class RendererMBUnit extends RenderBiped{
 		modelBody = new ModelBiped(0F);
 		
 	}
-	
-	
-	 private void renderUnit(EntityMBUnit unit, double par2,
+
+	private void renderUnit(EntityMBUnit unit, double par2,
 				double par4, double par6, float par8, float par9) {
 		 
 
@@ -50,6 +51,8 @@ public class RendererMBUnit extends RenderBiped{
 		this.modelBipedMain.bipedHeadwear.showModel = unit.getHelmNumber() > -1;
 			
 		super.doRenderLiving(unit, par2, par4, par6, par8, par9);
+		
+		renderInfo(unit, par2, par4, par6, 10);
 			 
 	}
 	 
@@ -113,6 +116,10 @@ public class RendererMBUnit extends RenderBiped{
 	            float var6 = 0.625F;
 
                 GL11.glTranslatef(0.0F, 0.1875F, 0.0F);
+                
+                if(weapon.isBigSheet()){
+                	GL11.glScalef(1F, 1.25F, 1.25F);
+                }
                 
                 GL11.glScalef(var6, -var6, var6);
                 GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
@@ -260,6 +267,149 @@ public class RendererMBUnit extends RenderBiped{
     public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
     {
         this.renderUnit((EntityMBUnit)par1Entity, par2, par4, par6, par8, par9);
+        
     }
+
+    
+    protected void renderInfo(EntityMBUnit unit, double x, double y, double z, int renderDistance){
+    	double var10 = unit.getDistanceSqToEntity(this.renderManager.livingPlayer);
+    	
+    	if(var10 <= renderDistance * renderDistance){
+    		FontRenderer var12 = this.getFontRendererFromRenderManager();
+            float var13 = 1.6F;
+            float var14 = 0.016666668F * var13;
+            GL11.glPushMatrix();
+            GL11.glTranslatef((float)x + 0.0F, (float)y + 2.3F+ 0.25F, (float)z);
+            GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+            GL11.glScalef(-var14, -var14, var14);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glDepthMask(false);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            Tessellator var15 = Tessellator.instance;
+            byte var16 = 0;
+            String order = unit.getDisplayOrder();
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            var15.startDrawingQuads();
+            int var17 = var12.getStringWidth(order) / 2;
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
+            var15.addVertex((double)(-var17 - 1), (double)(-1 + var16), 0.0D);
+            var15.addVertex((double)(-var17 - 1), (double)(8 + var16), 0.0D);
+            var15.addVertex((double)(var17 + 1), (double)(8 + var16), 0.0D);
+            var15.addVertex((double)(var17 + 1), (double)(-1 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
+            var15.addVertex((double)(-20), (double)(9 + var16), 0.0D);
+            var15.addVertex((double)(-20), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)(20), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)(20), (double)(9 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, .75F);
+            var15.addVertex((double)(20), (double)(9 + var16), 0.0D);
+            var15.addVertex((double)(20), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(9 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, .75F);
+            var15.addVertex((double)(-20.5), (double)(9 + var16), 0.0D);
+            var15.addVertex((double)(-20.5), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)(-20), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)(-20), (double)(9 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, .75F);
+            var15.addVertex((double)(-20.5), (double)(8.5 + var16), 0.0D);
+            var15.addVertex((double)(-20.5), (double)(9 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(9 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(8.5 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, .75F);
+            var15.addVertex((double)(-20.5), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)(-20.5), (double)(14 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(14 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(13.5 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, .75F);
+            var15.addVertex((double)(-20.5), (double)(11 + var16), 0.0D);
+            var15.addVertex((double)(-20.5), (double)(11.5 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(11.5 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(11 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, .75F);
+            var15.addVertex((double)(-20.5), (double)(11 + var16), 0.0D);
+            var15.addVertex((double)(-20.5), (double)(11.5 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(11.5 + var16), 0.0D);
+            var15.addVertex((double)(20.5), (double)(11 + var16), 0.0D);
+            var15.draw();
+            
+            
+            float health = (float)unit.getCurrentHealth() / (float)unit.getMaxHealth();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_I(calculateHealthColour(health), 127);
+            var15.addVertex((double)(-20), (double)(9 + var16), 0.0D);
+            var15.addVertex((double)(-20), (double)(11 + var16), 0.0D);
+            var15.addVertex((double)((40*health)-20), (double)(11 + var16), 0.0D);
+            var15.addVertex((double)((40*health)-20), (double)(9 + var16), 0.0D);
+            var15.draw();
+            
+            var15.startDrawingQuads();
+            var15.setColorRGBA_I(calculateExpColour(health), 127);
+            var15.addVertex((double)(-20), (double)(11.5 + var16), 0.0D);
+            var15.addVertex((double)(-20), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)((40*health)-20), (double)(13.5 + var16), 0.0D);
+            var15.addVertex((double)((40*health)-20), (double)(11.5 + var16), 0.0D);
+            var15.draw();
+            
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            var12.drawString(order, -var12.getStringWidth(order) / 2, var16, 553648127);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glDepthMask(true);
+            var12.drawString(order, -var12.getStringWidth(order) / 2, var16, -1);
+            
+            
+            
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glPopMatrix();
+    	}
+    }
+
+    
+    private int calculateHealthColour(float healthPercent){
+    	int health =  (int)Math.round((healthPercent)* 255);
+    	return 255 - health << 16 | health << 8;
+    }
+    
+    private int calculateExpColour(float expPercentage){
+    	int exp =  (int)Math.round((1-expPercentage)* 255);
+    	
+    	if(expPercentage == 0.5)
+    		return 255;
+    	else if(expPercentage < 0.5)
+    		return 255 | (exp - 128) << 16;
+    	else
+    		return 255 | 2* ((127 - exp) << 8);
+    }
+	
+    
+    
 
 }

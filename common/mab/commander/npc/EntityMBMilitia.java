@@ -47,7 +47,7 @@ public class EntityMBMilitia extends EntityMBUnit{
 
 	@Override
 	public EnumUnitItems getWeaponOption(){
-		switch(dataWatcher.getWatchableObjectByte(21)){
+		switch(getOption(3)){
 		case 0:
 			return EnumUnitItems.StoneSword;
 		case 1:

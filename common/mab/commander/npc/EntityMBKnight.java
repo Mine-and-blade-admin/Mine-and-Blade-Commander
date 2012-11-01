@@ -38,7 +38,7 @@ public class EntityMBKnight extends EntityMBUnit{
 		switch(getUnitType()){
 		case KnightShield:
 		case KnightDuel:
-			switch(dataWatcher.getWatchableObjectByte(21)){
+			switch(getOption(3)){
 			case 0:
 				return EnumUnitItems.IronSword;
 			case 1:
@@ -49,7 +49,7 @@ public class EntityMBKnight extends EntityMBUnit{
 					return null;
 			}
 		case KnightSpear:
-			switch(dataWatcher.getWatchableObjectByte(21)){
+			switch(getOption(3)){
 			case 0:
 				return EnumUnitItems.IronSpear;
 			case 1:
@@ -65,7 +65,7 @@ public class EntityMBKnight extends EntityMBUnit{
 		switch(getUnitType()){
 		case KnightShield:
 		case KnightSpear:
-			switch(dataWatcher.getWatchableObjectByte(22)){
+			switch(getOption(4)){
 			case 0:
 				return EnumUnitItems.IronShield;
 			case 1:
@@ -76,7 +76,7 @@ public class EntityMBKnight extends EntityMBUnit{
 					return null;
 			}
 		case KnightDuel:
-			switch(dataWatcher.getWatchableObjectByte(22)){
+			switch(getOption(4)){
 			case 0:
 				return EnumUnitItems.IronSword;
 			case 1:

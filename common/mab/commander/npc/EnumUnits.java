@@ -4,9 +4,9 @@ public enum EnumUnits {
 
 	Militia("unit.melee1", new int[]{4,5,5,6,-1,-1}, new int[]{2,0,1,3,-1,-1}, EntityMBMilitia.class),
 	
-	KnightShield("unit.melee3A", new int[]{4,5,5,2,2,2}, new int[]{2,0,1,3,4,5}, EntityMBKnight.class),
-	KnightDuel("unit.melee3B", new int[]{4,5,5,2,2,2}, new int[]{2,0,1,3,3,5}, EntityMBKnight.class),
-	KnightSpear("unit.melee3C", new int[]{4,5,5,1,2,2}, new int[]{2,0,1,3,4,5}, EntityMBKnight.class);
+	KnightShield("unit.melee3A", new int[]{4,5,5,2,2,4}, new int[]{2,0,1,3,4,5}, EntityMBKnight.class),
+	KnightDuel("unit.melee3B", new int[]{4,5,5,2,2,4}, new int[]{2,0,1,3,3,5}, EntityMBKnight.class),
+	KnightSpear("unit.melee3C", new int[]{4,5,5,1,2,4}, new int[]{2,0,1,3,4,5}, EntityMBKnight.class);
 	
 	private EnumUnits(String name, int[] optionMax, int[] optionLabels, Class unitClass){
 		this.name = name;

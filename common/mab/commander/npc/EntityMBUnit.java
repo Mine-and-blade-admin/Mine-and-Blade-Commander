@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.asm.SideOnly;
 
@@ -23,9 +24,14 @@ public abstract class EntityMBUnit extends EntityLiving{
 	public EntityMBUnit(World par1World, EnumTeam team, EnumUnits type) {
 		super(par1World);
 		
-		weaponDrawTimer = 20*30; //30 seconds
+		weaponDrawTimer = 20*10; //30 seconds
 		dataWatcher.addObject(16, (byte)team.ordinal());
 		dataWatcher.addObject(17, (byte)type.ordinal());
+		
+		dataWatcher.addObject(18, (byte)getMaxHealth());
+		dataWatcher.addObject(19, (byte)0);
+		
+		dataWatcher.addObject(27, (byte)0);
 	}
 	
 	@Override
@@ -35,30 +41,66 @@ public abstract class EntityMBUnit extends EntityLiving{
 		//DataWatcher Positions
 		//16 = team
 		//17 = subtype
-		//18-23 = cutomisation Options
-		//24 = owner
-		//25 = order
-		//26-28 = order data
+		//18 = health
+		//19 = experience
+		//20-25 = cutomisation Options
+		//26 = owner
+		//27 = weaponDraw
+		//28 = order
+		//29-31 = order data
 		
 		for(int i = 0; i < 6; i++){
-			dataWatcher.addObject(18+i, (byte)0);
-		}
-	}
-
-	@Override
-	public void onEntityUpdate() {
-		super.onEntityUpdate();
-		
-		if(getAITarget() == null){
-			if(weaponDrawTimer > 0)
-				weaponDrawTimer--;
-		}else{
-			weaponDrawTimer = 20*30;
+			dataWatcher.addObject(20+i, (byte)0);
 		}
 	}
 	
+    
+	@Override
+	public void onEntityUpdate() {
+		super.onEntityUpdate();
+	}
+	
+	/**
+     * Returns true if the newer Entity AI code should be run
+     */
+    public boolean isAIEnabled()
+    {
+        return true;
+    }
+    
+    /**
+    * main AI tick function, replaces updateEntityActionState
+    */
+   protected void updateAITick()
+   {
+	   
+	   if(getAITarget() == null && hurtTime == 0){
+			if(weaponDrawTimer > 0)
+				weaponDrawTimer--;
+		}else{
+			weaponDrawTimer = 20*10;
+		}
+	   
+	   if(weaponDrawTimer == 0 && isWeaponsDrawn())
+		   dataWatcher.updateObject(27, (byte)0);
+	   else if (weaponDrawTimer > 0 && !isWeaponsDrawn())
+		   dataWatcher.updateObject(27, (byte)1);
+	   
+       if(weaponDrawTimer == 0 && this.ticksExisted % 60 == 0){
+    	   this.heal(1);
+       }
+       
+       this.dataWatcher.updateObject(18, (byte)this.getHealth());
+   }
+	
+	
+	@Override
+	public void onLivingUpdate() {
+		super.onLivingUpdate();
+	}
+
 	public boolean isWeaponsDrawn(){
-		return weaponDrawTimer > 0;
+		return dataWatcher.getWatchableObjectByte(27) == 1;
 	}
 	
 	
@@ -115,7 +157,15 @@ public abstract class EntityMBUnit extends EntityLiving{
 	}
 	
 	public byte getOption(int option){
-		return dataWatcher.getWatchableObjectByte(18+option);
+		return dataWatcher.getWatchableObjectByte(20+option);
+	}
+	
+	public byte getCurrentHealth(){
+		return dataWatcher.getWatchableObjectByte(18);
+	}
+	
+	public byte getCurrentExperience(){
+		return dataWatcher.getWatchableObjectByte(19);
 	}
 	
 	public EnumTeam getTeam(){
@@ -127,7 +177,7 @@ public abstract class EntityMBUnit extends EntityLiving{
 	}
 
 	public void setOption(int option, byte value){
-		dataWatcher.updateObject(option+18, value);
+		dataWatcher.updateObject(option+20, value);
 	}
 
 	public String getSkinFile(){
@@ -184,5 +234,8 @@ public abstract class EntityMBUnit extends EntityLiving{
 		return null;
 	}
 	
+	public String getDisplayOrder(){
+		return "Stand Guard";
+	}
 	
 }
