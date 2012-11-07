@@ -1,0 +1,18 @@
+[
+{
+  "modid": "MaB-Commander",
+  "name": "Mine & Blade: Commander",
+  "description": "Adds customisable NPC soldiers to minecraft that can be ordered by the player",
+  "version": "0.0.2 pre",
+  "mcversion": "1.4.3",
+  "logoFile": "/MB_Logo.png",
+  "url": "",
+  "updateUrl": "",
+  "authors": ["nerd-boy"],
+  "credits": "By nerd-boy",
+  "parent": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
+
