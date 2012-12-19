@@ -4,6 +4,8 @@ import java.util.List;
 
 import mab.common.commander.EnumTeam;
 import mab.common.commander.MBCommander;
+import mab.common.commander.utils.CommonHelper;
+import mab.common.commander.utils.TeamMap;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.EntityPlayer;
@@ -134,7 +136,15 @@ public class BlockBanner extends BlockContainer{
 			int z, EntityPlayer par5EntityPlayer, int par6, float par7,
 			float par8, float par9) {
 		
-		par5EntityPlayer.openGui(MBCommander.INSTANCE, 0, par1World, x, y, z);
+		if(par1World.isRemote){
+			if(CommonHelper.isTeamGame())
+				if(TeamMap.getInstance().isOnSameTeam(par5EntityPlayer, EnumTeam.values()[par1World.getBlockMetadata(x, y, z)]))
+					par5EntityPlayer.openGui(MBCommander.INSTANCE, 0, par1World, x, y, z);
+				else
+					return false;
+			else
+				par5EntityPlayer.openGui(MBCommander.INSTANCE, 0, par1World, x, y, z);
+		}
 		
 		return true;
 	}

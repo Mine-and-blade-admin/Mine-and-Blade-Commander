@@ -1,5 +1,6 @@
 package mab.client.commander.utils;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,14 +13,22 @@ import org.lwjgl.opengl.GL12;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.TextureFXManager;
 
+import mab.common.commander.EnumTeam;
+import mab.common.commander.MBCommander;
 import mab.common.commander.npc.EntityMBUnit;
 import mab.common.commander.npc.EnumUnitItems;
+import mab.common.commander.utils.Spiral;
+import mab.common.commander.utils.TeamMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.FontRenderer;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MovingObjectPosition;
 import net.minecraft.src.RenderManager;
+import net.minecraft.src.RenderPlayer;
+import net.minecraft.src.StringTranslate;
 import net.minecraft.src.Tessellator;
 import net.minecraft.src.Vec3;
 import net.minecraftforge.client.IItemRenderer;
@@ -27,6 +36,67 @@ import net.minecraftforge.client.IItemRenderer;
 public class MBClientHelper {
 	
 	public static Random random = new Random();
+	public static StringTranslate st = StringTranslate.getInstance();
+	
+	public static String parseUnitDescription(EntityMBUnit unit){
+		
+		String descript = st.translateKey("entity.MaB-Commander."+unit.getUnitType().getName()+".descript");
+		return descript.replaceAll("@unit@", st.translateKey(unit.getUnitName()));
+	}
+	
+	public static int calcNoLinesForSplitString(FontRenderer fr, String string, int k){
+		
+		String[] var7 = string.split(" ");
+        int var8 = 0;
+        String var9;
+
+        int lineCount = 0;
+        for (var9 = ""; var8 < var7.length; ++var8)
+        {
+            String var10 = var7[var8];
+            
+            if (fr.getStringWidth(var10) >= k)
+            {
+                if (var9.length() > 0)
+                {
+                	lineCount++;
+                }
+
+                do
+                {
+                    int var11;
+
+                    for (var11 = 1; fr.getStringWidth(var10.substring(0, var11)) < k; ++var11)
+                    {
+                        ;
+                    }
+
+
+                    lineCount++;
+                    var10 = var10.substring(var11 - 1);
+                }
+                while (fr.getStringWidth(var10) >= k);
+
+                var9 = var10;
+            }
+            else if (fr.getStringWidth(var9 + " " + var10) >= k)
+            {
+            	lineCount++;
+                var9 = var10;
+            }
+            else
+            {
+                if (var9.length() > 0)
+                {
+                    var9 = var9 + " ";
+                }
+
+                var9 = var9 + var10;
+            }
+        }
+        return lineCount;
+            
+	}
 	
 	public static void renderUnitItems(EnumUnitItems item, Minecraft mc, boolean enchanted, int team){
 		
@@ -38,7 +108,11 @@ public class MBClientHelper {
 			
 		}else if (item.isShield()){
 			
-			renderImageAsItem(item.getImageSheet(), item.getShieldForTeam(team), 1, mc, enchanted, false);
+			renderImageAsItem(item.getImageSheet(), item.getBack(), 0.1F, mc, enchanted, false);
+			GL11.glTranslatef(0, 0, -0.00416F);
+			renderImageAsItem(item.getImageSheet(), item.getShieldForTeam(team), .8F, mc, enchanted, false);
+			GL11.glTranslatef(0, 0, -.075F);
+			renderImageAsItem(item.getImageSheet(), item.getTrim(), 0.3F, mc, enchanted, false);
 			
 		}else{
 			renderImageAsItem(item.getImageSheet(), item.getIndex(), 1, mc, enchanted, true);
@@ -396,12 +470,90 @@ public class MBClientHelper {
         return null;
     }
     
-    public static EntityMBUnit getUnitMouseOver(double distance, float f){
+    public static EntityMBUnit getUnitMouseOver(double distance, float f, EntityPlayer player){
     	MovingObjectPosition mouseOver = getMouseOver(distance, f);
-    	if(mouseOver != null && mouseOver.entityHit != null && mouseOver.entityHit instanceof EntityMBUnit){
+    	if(mouseOver != null && mouseOver.entityHit != null && mouseOver.entityHit instanceof EntityMBUnit
+    			&& !((EntityMBUnit)mouseOver.entityHit).isEnemy(player, false)){
     		return (EntityMBUnit) mouseOver.entityHit;
     	}else
     		return null;
     }
 
+	public static void renderTeamSymbolForPlayer(Object player, double par2, double par4, double par6){
+		EntityPlayer par1EntityPlayer = (EntityPlayer)player;
+		
+		if (Minecraft.isGuiEnabled() && 
+		//		par1EntityPlayer != RenderManager.instance.livingPlayer && 
+				!par1EntityPlayer.getHasActivePotion() &&
+				TeamMap.getInstance().getTeamForPlayer(par1EntityPlayer) != null)
+        {
+			RenderManager renderManager = RenderManager.instance;
+			float var8 = 1.6F;
+            float var9 = 0.016666668F * var8;
+            double var10 = par1EntityPlayer.getDistanceSqToEntity(renderManager.livingPlayer);
+            float var1 = par1EntityPlayer.isSneaking() ? RenderPlayer.NAME_TAG_RANGE_SNEAK : RenderPlayer.NAME_TAG_RANGE;
+            
+            if (var10 < (double)(var1 * var1)){
+            	
+            	String var13 = par1EntityPlayer.username;
+            	
+            	GL11.glPushMatrix();
+                
+            	if(par1EntityPlayer.isSneaking()){
+            		GL11.glTranslatef((float)par2 + 0.0F, (float)par4 + 2.5F, (float)par6);
+            	}else if(par1EntityPlayer.isPlayerSleeping()){
+                	 GL11.glTranslatef((float)par2 + 0.0F, (float)par4 + 1.3F, (float)par6);
+                 }else{
+                	 GL11.glTranslatef((float)par2 + 0.0F, (float)par4 + 2.8F, (float)par6);
+                 }
+                     
+                     float var14 = 0.016666668F * 1.6F;
+                     
+                     GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+                     GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+                     GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+                     GL11.glScalef(-var14, -var14, var14);
+                    
+                     Tessellator var15 = Tessellator.instance;
+                     
+                     
+                     byte var16 = 0;
+                     FontRenderer var12 = renderManager.getFontRenderer();
+                     String par2Str = TeamMap.getInstance().getTeamForPlayer(par1EntityPlayer).name();
+                     GL11.glDisable(GL11.GL_LIGHTING);
+                     var15.startDrawingQuads();
+
+                     if(par1EntityPlayer.isSneaking()){
+                    	 var15.setColorRGBA_F(1.0F, 1.0F, 1.0F, 0.25F);
+                    	 GL11.glDepthMask(false);
+                         GL11.glEnable(GL11.GL_BLEND);
+                         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                     }else
+                    	 var15.setColorRGBA_F(1.0F, 1.0F, 1.0F, 1.00F);
+                     
+                     GL11.glBindTexture(GL11.GL_TEXTURE_2D, FMLClientHandler.instance().getClient().renderEngine.getTexture(MBCommander.IMAGE_FOLDER+"BigItemSheet.png"));
+
+                     int index = TeamMap.getInstance().getTeamForPlayer(par1EntityPlayer).ordinal();
+                     
+                     float x = (float)(index%8) / 8F;
+ 		            float y = (float)(index/8 + 6) / 8F;
+ 		            
+ 		            
+                     var15.addVertexWithUV((double)(-16), (double)(-16), 0.0D, x, y);
+                     var15.addVertexWithUV((double)(-16), (double)(16), 0.0D, x, y + 1F/8F);
+                     var15.addVertexWithUV((double)(16), (double)(16), 0.0D, x + 1F/8F, y + 1F/8F);
+                     var15.addVertexWithUV((double)(16), (double)(-16), 0.0D, x+ 1F/8F, y);
+                     var15.draw();
+                     
+                     GL11.glDepthMask(true);
+                     GL11.glEnable(GL11.GL_LIGHTING);
+                     GL11.glDisable(GL11.GL_BLEND);
+                     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                     GL11.glPopMatrix();
+                     
+                     
+                 }
+            	
+            }
+        }
 }

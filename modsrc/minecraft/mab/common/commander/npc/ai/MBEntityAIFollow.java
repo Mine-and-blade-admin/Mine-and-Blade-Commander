@@ -27,6 +27,7 @@ public class MBEntityAIFollow extends EntityAIBase{
         this.theWorld = par1EntityTameable.worldObj;
         this.warpDist = par2;
         this.petPathfinder = par1EntityTameable.getNavigator();
+        this.petPathfinder.setEnterDoors(true);
         this.minDist = par3;
         this.maxDist = par4;
         this.setMutexBits(3);
@@ -70,6 +71,7 @@ public class MBEntityAIFollow extends EntityAIBase{
         this.timer = 0;
         this.avoidWater = unit.getNavigator().getAvoidsWater();
         unit.getNavigator().setAvoidsWater(false);
+        unit.getNavigator().setEnterDoors(true);
     }
     
     /**
@@ -95,7 +97,8 @@ public class MBEntityAIFollow extends EntityAIBase{
             {
                 this.timer = 10;
 
-                if (!this.petPathfinder.tryMoveToEntityLiving(owner, warpDist))
+                boolean a = this.petPathfinder.tryMoveToEntityLiving(owner, warpDist);
+                if (!a)
                 {
                     if (this.unit.getDistanceSqToEntity(owner) >= 50*50)
                     {

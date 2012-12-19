@@ -6,12 +6,16 @@ import java.nio.ByteBuffer;
 
 import mab.common.commander.CommanderPacketHandeler;
 import mab.common.commander.EnumTeam;
+import mab.common.commander.IUpgradeable;
+import mab.common.commander.npc.EntityMBUnit;
+import mab.common.commander.npc.EnumUnits;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.Packet;
 import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.TileEntity;
 
-public class TileEntityBanner extends TileEntity{
+public class TileEntityBanner extends TileEntity implements IUpgradeable{
 	
 	//0-7 (on ground top)
 	//8-15 (on ground base)
@@ -105,6 +109,36 @@ public class TileEntityBanner extends TileEntity{
 			return null;
 		}
 		
+	}
+
+	@Override
+	public EnumUnits[] getUpgrades() {
+		return new EnumUnits[]{EnumUnits.Militia};
+	}
+
+	@Override
+	public int getFirstEditableOptionIndex() {
+		return 0;
+	}
+
+	@Override
+	public Packet250CustomPayload generatePacket(EntityMBUnit unit, EntityPlayer player) {
+		if(isBase()){
+			return CommanderPacketHandeler.generateSpawnPacket(unit, xCoord, yCoord, zCoord, player);
+		}else{
+			return CommanderPacketHandeler.generateSpawnPacket(unit, xCoord, yCoord - 1, zCoord, player);
+		}
+		
+	}
+
+	@Override
+	public EntityMBUnit getDefaltUnit() {
+		return null;
+	}
+
+	@Override
+	public byte getDefaultOption(int i) {
+		return 0;
 	}
 	
 	

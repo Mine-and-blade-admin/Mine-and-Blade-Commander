@@ -20,14 +20,14 @@ public class MBEntityAIStandGuard extends EntityAIBase{
 	    {
 	        this.unit = par1EntityTameable;
 	        this.theWorld = par1EntityTameable.worldObj;
-	        this.warpDist = 1;
+	        this.warpDist = 1F;
 	        this.petPathfinder = par1EntityTameable.getNavigator();
 	    }
 	 
 	@Override
 	public boolean shouldExecute() {
 		return unit.getOrder() == EnumOrder.StandGuard 
-				&& distSqToTarget() > warpDist*warpDist
+				&& distSqToTarget() >= .1F
 				&& unit.getAttackTarget() == null;
 				
 	}
@@ -49,8 +49,7 @@ public class MBEntityAIStandGuard extends EntityAIBase{
     {
         this.timer = 0;
         int[] data = unit.getOrderData();
-        System.out.println((data[0]+.5F)+", "+data[1]+", "+ (data[2]+.5F));
-        System.out.println(this.petPathfinder.tryMoveToXYZ(data[0]+.5F, data[1], data[2]+.5F,.3F));
+        this.petPathfinder.tryMoveToXYZ(data[0]+.5F, data[1], data[2]+.5F,.3F);
         this.avoidWater = unit.getNavigator().getAvoidsWater();
         unit.getNavigator().setAvoidsWater(false);
     }
@@ -60,11 +59,13 @@ public class MBEntityAIStandGuard extends EntityAIBase{
      */
     public void resetTask()
     {
-        //this.petPathfinder.clearPathEntity();
+        this.petPathfinder.clearPathEntity();
         unit.getNavigator().setAvoidsWater(avoidWater);
-        if(unit.getAttackTarget() == null && unit.hurtTime == 0 && distSqToTarget() > (double)(this.warpDist * this.warpDist) ){
+        double dist = distSqToTarget();
+        if(unit.getAttackTarget() == null && unit.hurtTime == 0 
+        		&& dist < (double)(this.warpDist * this.warpDist)){
 	        int[] data = unit.getOrderData();
-	        //unit.setPosition(data[0]+.5F, data[1], data[2]+.5F);
+	        unit.setPositionAndUpdate(data[0]+.5F, data[1], data[2]+.5F);
         }
     }
 	
@@ -91,6 +92,11 @@ public class MBEntityAIStandGuard extends EntityAIBase{
                 int[] data = unit.getOrderData();
                
                 this.petPathfinder.tryMoveToXYZ(data[0]+.5F, data[1], data[2]+.5F,.3F);
+            }
+            
+            if(distSqToTarget() < 1){
+            	 int[] data = unit.getOrderData();
+     	        unit.setPositionAndUpdate(data[0]+.5F, data[1], data[2]+.5F);
             }
         }
     }

@@ -44,7 +44,7 @@ public class BlockItemBanner extends ItemBlock{
 			if(world.getBlockId(x, y+1, z) == 0)
 			{
 				
-				boolean placed = super.placeBlockAt(stack, player, world, x, y, z, side, hitX, hitY, hitZ, i);
+				boolean placed = super.placeBlockAt(stack, player, world, x, y, z, side, hitX, hitY, hitZ,  i);
 				
 				world.setBlockAndMetadata(x, y+1, z, MBCommander.INSTANCE.banner.blockID, stack.getItemDamage());
 				

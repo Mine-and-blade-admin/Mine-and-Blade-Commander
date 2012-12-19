@@ -6,14 +6,18 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.jws.Oneway;
+import javax.swing.JTable.PrintMode;
 
+import mab.client.commander.utils.MBClientHelper;
 import mab.common.commander.block.TileEntityBanner;
 import mab.common.commander.npc.EntityMBUnit;
 import mab.common.commander.npc.EnumUnits;
 import mab.common.commander.npc.ai.EnumOrder;
-import mab.common.commander.npc.melee.EntityMBMilitia;
+import mab.common.commander.utils.CommonHelper;
+import mab.common.commander.utils.TeamPacketHandeler;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.INetworkManager;
@@ -21,6 +25,7 @@ import net.minecraft.src.InventoryPlayer;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.MathHelper;
+import net.minecraft.src.Packet;
 import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
@@ -33,9 +38,11 @@ import cpw.mods.fml.common.network.Player;
 public class CommanderPacketHandeler implements IPacketHandler {
 	
 	public static String BannerPacket = "MBc|Banner";
-	public static String BannerPacketDespawn = "MBc|BannerD";
 	public static String spawnPacket = "MBc|Spawn";
+	public static String upgradePacket = "MBc|Upgrade";
 	public static String orderPacket = "MBc|Order";
+	public static String particlePacket = "MBc|Particle";
+	public static String teamPacket = "MBc|Team";
 
 	@Override
 	public void onPacketData(INetworkManager manager,
@@ -64,23 +71,10 @@ public class CommanderPacketHandeler implements IPacketHandler {
 			EntityMBUnit unit = readUnitFromPacket(packet, entityPlayer.worldObj, entityPlayer);
 			entityPlayer.worldObj.spawnEntityInWorld(unit);
 
-			//Packet250CustomPayload packet2 = new Packet250CustomPayload(BannerPacketDespawn, packet.data);
 			
-			//PacketDispatcher.sendPacketToAllPlayers(packet2);
-			
-		}else if (packet.channel.equals(BannerPacketDespawn)){
-//			int x = readIntFromByteArray(packet.data, 4);
-//			int y = readIntFromByteArray(packet.data, 8);
-//			int z = readIntFromByteArray(packet.data, 12);
-//			
-//			entityPlayer.worldObj.setBlockTileEntity(x, y, z, null);
-//			entityPlayer.worldObj.setBlockTileEntity(x, y+1, z, null);
-//			
-//			entityPlayer.worldObj.setBlockWithNotify(x, y, z, 0);
-//			entityPlayer.worldObj.setBlockWithNotify(x, y+1, z, 0);
+		}else if (packet.channel.equals(upgradePacket)){
+			readAndProcessUpgradePacket(packet, entityPlayer.worldObj, entityPlayer);
 		}else if(packet.channel.equals(orderPacket)){
-			
-			
 			
 			DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(packet.data));
 			try {
@@ -89,31 +83,176 @@ public class CommanderPacketHandeler implements IPacketHandler {
 				EnumOrder order = EnumOrder.values()[inputStream.readByte()];
 				byte size = inputStream.readByte();
 				
+				
 				int[] data = new int[3];
 				String stringData = "";
 				
+				EntityMBUnit[] units = new EntityMBUnit[size];
 				for(int i = 0; i < size; i++){
 					
 					Entity e = entityPlayer.worldObj.getEntityByID(inputStream.readInt());
 					
 					if(e != null && e instanceof EntityMBUnit){
-						order.setOrderFromPacketData((EntityMBUnit)e, entityPlayer);
+						units[i] = (EntityMBUnit)e;
 					}else{
 						System.out.println("Mine & Blade: Unexpected Entity ID in Order Packet");
 					}
 					
 				}
 				
+				if(order == EnumOrder.GoTo){
+					
+					for(int i = 0; i < 3; i++)
+						data[i] = inputStream.readInt();
+					CommonHelper.findAndSetGotoPos(units, data);
+
+					units[0].setOrder(EnumOrder.StandGuard, data, "");
+					
+				}else if(order == EnumOrder.TargetDist){
+					for(int i = 0; i < size; i++){
+						units[i].setTargetDistance(data[0]);
+						units[i].setAttackTarget(null);
+					}
+				}else{
+					for(int i = 0; i < size; i++){
+						
+						order.setOrderFromPacketData(units[i], entityPlayer);
+					}
+				}
+				
 				
 			}catch(Exception e){
 				e.printStackTrace();
 			}			
+		}else if (packet.channel.equals(particlePacket)){
+			readAndProcessParticlerPacket(packet, entityPlayer, entityPlayer.worldObj);
+		}else if(packet.channel.equals(teamPacket)){
+			TeamPacketHandeler.readAndProcessTeamPacket(packet, entityPlayer);
 		}
 		
 	}
 	
+	private void readAndProcessParticlerPacket(Packet250CustomPayload p,
+			EntityPlayer entityPlayer, World world) {
+		DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(p.data));
+		try{
+			
+			byte type = inputStream.readByte();
+			
+			switch (type) {
+			case 0: //spawn effect
+				Entity e = world.getEntityByID(inputStream.readInt());
+				if(e != null){
+					 for (int var1 = 0; var1 < 20; ++var1)
+			            {
+			                double var8 = world.rand.nextGaussian() * 0.02D;
+			                double var4 = world.rand.nextGaussian() * 0.02D;
+			                double var6 = world.rand.nextGaussian() * 0.02D;
+			                world.spawnParticle("explode", 
+			                		e.posX + (double)(world.rand.nextFloat() * e.width * 2.0F) - 
+			                		(double)e.width, e.posY + (double)(world.rand.nextFloat() * e.height),
+			                		e.posZ + (double)(world.rand.nextFloat() * e.width * 2.0F) - (double)e.width, var8, var4, var6);
+			            }
+				}
+				 
+				break;
+			default:
+				break;
+			}
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+
+	public static Packet250CustomPayload generateUpgradePacket(EntityMBUnit previousUnit, EntityMBUnit unit, EntityPlayer player){
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(15);
+		DataOutputStream outputStream = new DataOutputStream(bos);
+		try {
+			
+			outputStream.writeInt(previousUnit.entityId);
+			outputStream.writeByte((byte)unit.getUnitType().ordinal());
+			
+			for(int i = 0; i < 6; i++){
+				outputStream.writeByte(unit.getOption(i));
+			}
+			
+			outputStream.writeInt(player.entityId);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+		return new Packet250CustomPayload(upgradePacket, bos.toByteArray());
+	}
+	
+	public static void readAndProcessUpgradePacket(Packet250CustomPayload p, World world, EntityPlayer player){
+		if(p.channel.equals(upgradePacket)){
+
+			DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(p.data));
+			try{
+				
+				Entity e = world.getEntityByID(inputStream.readInt());
+				if(e != null && e instanceof EntityMBUnit){
+					EntityMBUnit previous = (EntityMBUnit)e;
+					
+					EntityMBUnit unit = EntityMBUnit.generateUnit(world,previous.getTeam(), EnumUnits.values()[inputStream.readByte()]);
+					
+					unit.setLocationAndAngles(
+							previous.posX,
+							previous.posY, 
+							previous.posZ, 
+							previous.rotationYaw,
+							previous.rotationPitch);
+					
+					unit.setOrder(previous.getOrder(), previous.getOrderData(), previous.getOrderStringData());
+					
+					unit.setBaseMorale(previous.getBaseMorale());
+					
+					previous.setDead();
+					
+					PacketDispatcher.sendPacketToAllAround(unit.posX, unit.posY, unit.posZ, 30, unit.dimension, generateParticleEffectPacket((byte)0, previous));
+
+					for(int i = 0; i < 6; i++){
+						unit.setOption(i, inputStream.readByte());
+					}
+					
+					
+					e = world.getEntityByID(inputStream.readInt());
+					if(e instanceof EntityPlayer && !((EntityPlayer)e).capabilities.isCreativeMode){
+						InventoryPlayer inv = ((EntityPlayer)e).inventory;
+						int required = unit.getCost();
+						MBCommander.PROXY.scanForGold(inv,required);
+					}
+					
+					unit.setOwner(previous.getOwner());
+					
+					world.spawnEntityInWorld(unit);
+					
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	
+	private static Packet250CustomPayload generateParticleEffectPacket(byte i, Entity centerEntity) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(5);
+		DataOutputStream outputStream = new DataOutputStream(bos);
+		try {
+			outputStream.writeByte(i);
+			outputStream.writeInt(centerEntity.entityId);
+			
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new Packet250CustomPayload(particlePacket, bos.toByteArray());
+	}
+
 	public static Packet250CustomPayload generateSpawnPacket(EntityMBUnit unit, int x, int y, int z, EntityPlayer player){
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(31);
@@ -133,6 +272,8 @@ public class CommanderPacketHandeler implements IPacketHandler {
 			for(int i = 0; i < 6; i++){
 				outputStream.writeByte(unit.getOption(i));
 			}
+			
+			
 			
 			outputStream.writeInt(player.entityId);
 		
@@ -186,7 +327,7 @@ public class CommanderPacketHandeler implements IPacketHandler {
 					int required = unit.getCost();
 					MBCommander.PROXY.scanForGold(inv,required);
 				}
-				
+				unit.setOwner(player.username);
 				
 				return unit;
 			}catch(Exception e){
@@ -198,12 +339,4 @@ public class CommanderPacketHandeler implements IPacketHandler {
 		
 	}
 	
-	private static int readIntFromByteArray(byte[] bytes, int index){
-		return ByteBuffer.allocate(4).put(bytes, index, 4).getInt(0);
-	}
-	
-	private static void writeIntToByteArray(byte[] data, int value, int position){
-		ByteBuffer b = ByteBuffer.allocate(4);
-		System.arraycopy(b.putInt(value).array(), 0, data, position, 4);
-	}
 }

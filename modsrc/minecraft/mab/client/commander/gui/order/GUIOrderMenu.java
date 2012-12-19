@@ -11,6 +11,8 @@ import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
 
+import mab.client.commander.ClientProxy;
+import mab.client.commander.utils.EntityGoToWaypoint;
 import mab.common.commander.CommanderPacketHandeler;
 import mab.common.commander.MBCommander;
 import mab.common.commander.npc.EntityMBUnit;
@@ -39,8 +41,11 @@ public class GUIOrderMenu extends Gui{
 	private int orderMenuState = HIDEN;
 	
 	private int selected = 0;
-	private EnumOrder[] orders = new EnumOrder[]{EnumOrder.StandGuard, EnumOrder.Follow};
+	private EnumOrder[] orders = new EnumOrder[]{};
+	private EnumOrder[] subMenu = null;
 	
+	private static EnumOrder[] gotoSubMenu = new EnumOrder[]{EnumOrder.GoToSelect, EnumOrder.GoToCancel};
+
 	private long lastRender = 0;
 	
 	public GUIOrderMenu(Minecraft par1Minecraft)
@@ -49,15 +54,13 @@ public class GUIOrderMenu extends Gui{
         fontRenderer = mc.fontRenderer;
     }
 	
-	
-    public void renderOverlayLeftTexturedBox()
+    public void renderOverlayRightBox()
     {
     	
-    	System.out.println(orderMenuState);
     	if(isShowing()){
-    		out = out + ((float)(System.currentTimeMillis() - lastRender)) / 500f;
+    		out = out + ((float)(System.currentTimeMillis() - lastRender)) / 300f;
     	}else if(isHiding()){
-    		out = Math.max(0, out - ((float)(System.currentTimeMillis() - lastRender)) / 500f);
+    		out = Math.max(0, out - ((float)(System.currentTimeMillis() - lastRender)) / 300f);
     	}
     	
     	if(out >= 1){
@@ -70,58 +73,37 @@ public class GUIOrderMenu extends Gui{
     	}
     		
     	if(!isHidden()){
+    		EnumOrder[] menu = getCurrentMenu();
     		
     		ScaledResolution sr = new ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
             int width = sr.getScaledWidth();
             int height = sr.getScaledHeight();
             
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, mc.renderEngine.getTexture("/extendedGUI/image/GUI Controls.png"));
-            drawTexturedModalRect(0, 75, 125 - (int)(125*out), 213, (int)(125*out), 20);
-            for(int i = 0; i < orders.length; i++){
-            	 drawTexturedModalRect(0, 95+17*i, 125 - (int)(125*out), 233, (int)(125*out), 17);
-            }
-            drawTexturedModalRect(0, 95+17*orders.length, 125 - (int)(125*out), 250, (int)(125*out), 6);
+            drawRect(width - (int)(120*out), 75, width, menu.length*17 + 20 + 75, 127<<24);
             
             String message = StringTranslate.getInstance().translateKey("gui.order.label")+" ("+MBCommander.PROXY.getSelectedUnits().size()+")";
-            
-            fontRenderer.drawString(message, (int)(125*out) - (125 + fontRenderer.getStringWidth(message))/2 , 81, 0x404040);
-    		
-    		for(int i = 0; i < orders.length; i++){
-    			int colour = 0xFFFFFF;
-    			if(selected == i)
-    				colour = 0xFFFF00;
-    			drawString(fontRenderer, orders[i].getTranslatedLabel(null), (int)(125*out)+15 - 125, 99+17*i, colour);    			
-    		}
-    		
-    		
-            
-    		
-    		
-    		
-    		
-            drawRect(width - (int)(120*out), 75, width, orders.length*17 + 20 + 75, 127<<24);
-            
-    		drawString(fontRenderer, message, (int)(width - 120*out) + 60 - fontRenderer.getStringWidth(message)/2, 77, 0xFFFFFF);
-    		for(int i = 0; i < orders.length; i++){
+    		drawString(fontRenderer, message, (int)(width - 120*out) + 60 - fontRenderer.getStringWidth(message)/2, 80, 0xFFFFFF);
+    		for(int i = 0; i < menu.length; i++){
     			int colour = 0xAAAAAA;
     			if(selected == i)
     				colour = 0xFFFF00;
-    			drawString(fontRenderer, orders[i].getTranslatedLabel(null), (int)(width - 120*out)+10, 97+17*i, colour);    			
+    			drawString(fontRenderer, menu[i].getTranslatedLabel(null), (int)(width - 120*out)+10, 97+17*i, colour);    			
     		}
-    		
     	}
+    	
+    	
+    	lastRender = System.currentTimeMillis();
     	
     	if(MBCommander.PROXY.getSelectedUnits().size() < 1)
     		hide();
     	
-    	
-    	lastRender = System.currentTimeMillis();
+    	GL11.glColor3f(1F, 1F, 1F);
     }
     
-    public void renderOverlayRightBox()
+    
+    public void renderOverlayLeftBox()
     {
     	
-    	System.out.println(orderMenuState);
     	if(isShowing()){
     		out = out + ((float)(System.currentTimeMillis() - lastRender)) / 300f;
     	}else if(isHiding()){
@@ -139,56 +121,94 @@ public class GUIOrderMenu extends Gui{
     		
     	if(!isHidden()){
     		
+    		EnumOrder[] menu = getCurrentMenu();
+    		
     		ScaledResolution sr = new ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
             int width = sr.getScaledWidth();
             int height = sr.getScaledHeight();
             
-            drawRect(width - (int)(120*out), 75, width, orders.length*17 + 20 + 75, 127<<24);
+            drawRect(0, 75, (int)(125*out), orders.length*17 + 20 + 75, 127<<24);
             
             String message = StringTranslate.getInstance().translateKey("gui.order.label")+" ("+MBCommander.PROXY.getSelectedUnits().size()+")";
-    		drawString(fontRenderer, message, (int)(width - 120*out) + 60 - fontRenderer.getStringWidth(message)/2, 80, 0xFFFFFF);
+    		drawString(fontRenderer, message, (int)(120*out) + 60 - fontRenderer.getStringWidth(message)/2-125, 80, 0xFFFFFF);
     		for(int i = 0; i < orders.length; i++){
     			int colour = 0xAAAAAA;
     			if(selected == i)
     				colour = 0xFFFF00;
-    			drawString(fontRenderer, orders[i].getTranslatedLabel(null), (int)(width - 120*out)+10, 97+17*i, colour);    			
+    			drawString(fontRenderer, orders[i].getTranslatedLabel(null), (int)(120*out)+10-125, 97+17*i, colour);    			
     		}
     	}
     	
     	
     	lastRender = System.currentTimeMillis();
+    	
+    	if(MBCommander.PROXY.getSelectedUnits().size() < 1)
+    		hide();
+    	
+    	GL11.glColor3f(1F, 1F, 1F);
     }
     
     public void setOrders(EnumOrder[] orders){
     	this.orders = orders;
+    	this.subMenu = null;
+    }
+    
+    public void setSubMenu(EnumOrder current){
+    	if(current==null)
+    		subMenu = null;
+    	else{
+	    	switch (current) {
+			case GoTo:
+				selected = 0;
+				subMenu = gotoSubMenu;
+				break;
+			default:
+				subMenu = null;
+			}
+    	}
     }
     
     public void applySelectedOrder(List<EntityMBUnit> units, EntityPlayer player){
     	
-    	if(selected >= 0 && selected < orders.length){
+    	EnumOrder[] menu = getCurrentMenu();
+		
+    	if(selected >= 0 && selected < menu.length){
     		Packet packet = null;
     		try{
     			// orderID
     			// array size
     			// 
-    			ByteArrayOutputStream bos = new ByteArrayOutputStream(4 + 1 + 1 + units.size() * 4);
-				DataOutputStream outputStream = new DataOutputStream(bos);
-				
-		    	switch (orders[selected]) {
+		    	switch (menu[selected]) {
 				case Follow:
 				case StandGuard:
-					
+					ByteArrayOutputStream bos = new ByteArrayOutputStream(4 + 1 + 1 + units.size() * 4);
+					DataOutputStream outputStream = new DataOutputStream(bos);
 					outputStream.writeInt(player.entityId);
 					
 					outputStream.writeByte((byte)orders[selected].ordinal());
 					outputStream.writeByte((byte)units.size());
-					
 					for (EntityMBUnit entityMBUnit : units) {
 						outputStream.writeInt(entityMBUnit.entityId);
 					}
 					
 					packet = new Packet250CustomPayload(CommanderPacketHandeler.orderPacket, bos.toByteArray());
-					
+					MBCommander.PROXY.resetSelectedUnits();
+					break;
+				case Upgrade:
+					player.openGui(MBCommander.INSTANCE, 1, player.worldObj, units.get(0).entityId, -1, -1);
+					MBCommander.PROXY.resetSelectedUnits();
+					break;
+				case GoTo:
+					setSubMenu(EnumOrder.GoTo);
+					break;
+				case GoToSelect:
+					EntityGoToWaypoint waypoint = ((ClientProxy)MBCommander.PROXY).waypoint;
+					if( waypoint != null){
+						packet = waypoint.setGoToOrder(units, player);
+						((ClientProxy)MBCommander.PROXY).removeWaypoint();
+						MBCommander.PROXY.resetSelectedUnits();
+						this.setSubMenu(null);
+					}
 					break;
 				default:
 					break;
@@ -240,15 +260,24 @@ public class GUIOrderMenu extends Gui{
 	public void moveSelectionUp(){
 		selected = selected -1;
 		if(selected < 0)
-			selected = orders.length-1;
+			selected = getCurrentMenu().length-1;
 	}
 	
 	public void moveSelectionDown(){
 		selected = selected + 1;
-		if(selected >= orders.length)
+		if(selected >= getCurrentMenu().length)
 			selected = 0;
 	}
 
+	public EnumOrder[] getCurrentMenu(){
+		if(subMenu == null)
+			return orders;
+		else
+			return subMenu;
+	}
 	
+	public boolean isMainMenu(){
+		return subMenu == null;
+	}
 	
 }

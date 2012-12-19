@@ -17,8 +17,6 @@ import cpw.mods.fml.common.TickType;
 
 public class MBKeyHandeler extends KeyHandler{
 	
-	
-	
 	public static final KeyBinding selectUnit = new KeyBinding("Select Unit", Keyboard.KEY_X);
 	public static final KeyBinding up = new KeyBinding("Menu Up", Keyboard.KEY_UP);
 	public static final KeyBinding altDown = new KeyBinding("Order Menu Navagate", Keyboard.KEY_Z);
@@ -46,53 +44,48 @@ public class MBKeyHandeler extends KeyHandler{
 		
 		GUIOrderMenu menu = getOrderMenu();
 		
-		if(tickEnd){			
-			switch (kb.keyCode) {
-			case Keyboard.KEY_X:
+		if(tickEnd){
+			
+			if(kb == selectUnit){
 				List<EntityMBUnit> selected = MBCommander.PROXY.getSelectedUnits();
-				EntityMBUnit unit = MBClientHelper.getUnitMouseOver(5, 0);
+				EntityMBUnit unit = MBClientHelper.getUnitMouseOver(5, 0, mc.thePlayer);
 				
 				if(unit != null){
 					if(!selected.contains(unit)){
 						selected.add(unit);
+						MBCommander.PROXY.reparseOrderGUIOptions();
 						menu.show();
+					}else{
+						selected.remove(unit);
+						MBCommander.PROXY.reparseOrderGUIOptions();
+						if(selected.isEmpty())
+							menu.hide();
 					}
 				}else{
-					MBCommander.PROXY.resetSelectedUnits();
-					menu.hide();
+					//MBCommander.PROXY.resetSelectedUnits();
+					//menu.hide();
 				}
-				
-				break;
-			case Keyboard.KEY_UP:
+			}else if (kb == up){
 				if(menu.isDisplayed() || menu.isShowing()){
 					menu.moveSelectionUp();
 				}
-				break;
-			case Keyboard.KEY_Z:
-			case Keyboard.KEY_DOWN:
+			}else if (kb == down || kb == altDown){
 				if(menu.isDisplayed() || menu.isShowing()){
 					menu.moveSelectionDown();
 				}
-				break;
-			case Keyboard.KEY_C:
+			}else if (kb == selectOrder){
+				menu.applySelectedOrder(MBCommander.PROXY.getSelectedUnits(), FMLClientHandler.instance().getClient().thePlayer);				
+			}else if (kb == cancel){
 				MBCommander.PROXY.resetSelectedUnits();
 				menu.hide();
-				break;
-			case Keyboard.KEY_RETURN:
-				menu.applySelectedOrder(MBCommander.PROXY.getSelectedUnits(), FMLClientHandler.instance().getClient().thePlayer);
-				menu.hide();
-				MBCommander.PROXY.resetSelectedUnits();
-				break;
-			default:
-				break;
 			}
+
 		}
 		
 	}
 
 	private void handelSelect() {
 		GUIOrderMenu orderMenu = getOrderMenu();
-		
 	}
 	
 	private static GUIOrderMenu getOrderMenu(){

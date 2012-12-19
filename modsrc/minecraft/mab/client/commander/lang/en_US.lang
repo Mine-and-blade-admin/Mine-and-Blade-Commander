@@ -1,0 +1,118 @@
+team.black=Black
+team.red=Red
+team.green=Green
+team.brown=Brown
+team.blue=Blue
+team.purple=Purple
+team.cyan=Cyan
+team.silver=Silver
+team.grey=Grey
+team.pink=Pink
+team.lime=Lime
+team.yellow=Yellow
+team.lightblue=Light Blue
+team.magenta=Magenta
+team.orange=Orange
+team.white=White
+
+mb.gameStart=Starting a Team Game, You have joined the @team@ team
+mb.gameRestart=Restarting team game, you are now on the @team@ team
+mb.gameEnd=Ending team game
+mb.gameJoin=Team game in progress, you have joined the @team@ team
+mb.gameFailStart=Team game already in progress, end the current game before starting a new game
+
+tile.banner.black.name=Black Banner
+tile.banner.red.name=Red Banner
+tile.banner.green.name=Green Banner
+tile.banner.brown.name=Brown Banner
+tile.banner.blue.name=Blue Banner
+tile.banner.purple.name=Purple Banner
+tile.banner.cyan.name=Cyan Banner
+tile.banner.silver.name=Silver Banner
+tile.banner.grey.name=Grey Banner
+tile.banner.pink.name=Pink Banner
+tile.banner.lime.name=Lime Banner
+tile.banner.yellow.name=Yellow Banner
+tile.banner.lightblue.name=Light Blue Banner
+tile.banner.magenta.name=Magenta Banner
+tile.banner.orange.name=Orange Banner
+tile.banner.white.name=White Banner
+
+tile.banner=Banner
+
+item.trumpet.name=Trumpet
+
+entity.MaB-Commander.militia.name=Militia
+entity.MaB-Commander.militia.descript=The @unit@ is little more than a peasant who has been thrust into the middle of a battle. They are armed with whatever they find lying around and their clothing offers little in the way of protection.
+
+entity.MaB-Commander.manatarms.name=Man at Arms
+entity.MaB-Commander.manatarms.descript=The @unit@ form the backbone of the armies of the land. They are provided with iron weapons and chainmail armor allowing them to be both durable and deadly.
+
+entity.MaB-Commander.spearman.name=Spearman
+entity.MaB-Commander.spearman.descript=Although the @unit@'s weapons may be slightly unwieldy, they more than make up for it in the extended range their iron weapons provide. Coupled with their chain based armor this makes the @unit@ a formidable force.
+
+entity.MaB-Commander.knight.name=Knight
+entity.MaB-Commander.knight.descript=The @unit@ is provided with the best iron based weapons, armour and shields. Their heavy armour and shields make them the most durable warriors in the land.
+
+entity.MaB-Commander.sellsword.name=Sellsword
+entity.MaB-Commander.sellsword.descript=Armed with 2 of the best iron based weapons in the land, The @unit@ are easily able to take down more heavily armed foes. This however does come at the expense of their armor, which is less heavy then other units.
+
+entity.MaB-Commander.pikeman.name=Pikeman
+entity.MaB-Commander.pikeman.descript=The extended range provided by the @unit@'s iron weapons allows them to attack enemy safely from a short range. Even those enemies that do get past their jabs must face a heavily armoured foe.
+
+gui.spawn=Spawn
+gui.spawn.cost=Cost
+gui.details=Details
+
+gui.details.stats=Stats
+
+gui.details.attack=Attack
+gui.details.health=Health
+gui.details.armour=Armor
+gui.details.range=Range
+gui.details.rate=Rate of Fire
+
+gui.details.attack.details=How much damage the unit causes
+gui.detials.health.details=The maximum health of the unit
+gui.details.armour.details=The armor value for the unit
+gui.details.range.details=The horizontal distance in blocks the unit can shoot
+gui.details.rate.details=The amount of ticks it takes the unit to fire
+
+gui.details.special=Special Abilities
+
+special.extend_Reach=Extended Reach
+special.slow_attack=Slow Attack
+special.penatrate=Penetrate Armor
+special.leap=Leap
+special.arrow_block=Arrow Block
+
+special.extend_Reach.decription=The @unit@'s weapon allows it to attack from a couple of blocks away
+special.slow_attack.decription=Due to the @unit@'s unwieldy weapon, the @unit@ attacks at a slower rate
+special.penatrate.decription=A small proportion of the damage the @unit@ causes ignores armor
+special.leap.decription=The @unit@ leaps at it's target
+special.arrow_block.decription=25% of all projectile damage is ignored by the @unit@
+
+gui.options.skin=Skin
+gui.options.hair=Hair
+gui.options.eyes=Eyes
+gui.options.weapons=Weapon
+gui.options.shields=Shield
+gui.options.helmet=Helmet
+gui.options.horse=Horse
+
+gui.spawn.currency=Gold
+gui.spawn.required=Required
+gui.spawn.have=Have
+
+gui.screen.select=Press @key@ to select @unit@
+
+gui.order.label=Order
+order.follow=Follow
+order.stand_guard=Stand Guard
+order.details=Details
+order.upgrade=Upgrade
+order.goto=Go To..
+order.goto.select=Select
+order.goto.cancel=Cancel
+
+authors={nerd-boy}

@@ -43,9 +43,14 @@ public enum EnumUnitItems {
 	
 	IronHalberard(2, 6, true),
 	
-	IronShield(1, 208, 179, 180),
-	GoldShield(1, 208+32, 179+6, 180+6),
-	DiamondShield(1, 208+16, 179+3, 180+3);
+	IronGlaive(2, 7, true),
+	
+	WoodShield(1, 161, 165, 160, false),
+	HideShield(1, 208-16-16, 179-3+2, 180-3, false),
+	HideShiedPaint(1, 208-16, 179-3+2, 180-3),
+	IronShieldPaint(1, 208, 179, 180),
+	GoldShieldPaint(1, 208+32, 179+6, 180+6),
+	DiamondShieldPaint(1, 208+16, 179+3, 180+3);
 	
 	private int image;
 	private int index;
@@ -53,6 +58,7 @@ public enum EnumUnitItems {
 	
 	private int back = -1;
 	private int trim = -1;
+	private boolean colour = false;
 	
 	EnumUnitItems(int image, int index){
 		this(image, index, false);
@@ -65,9 +71,16 @@ public enum EnumUnitItems {
 	}
 	
 	EnumUnitItems(int image, int front, int back, int trim){
+		this(image, front, back, trim, true);
+		this.back = back;
+		this.trim = trim;
+	}
+	
+	EnumUnitItems(int image, int front, int back, int trim, boolean colour){
 		this(image, front, false);
 		this.back = back;
 		this.trim = trim;
+		this.colour = colour;
 	}
 	
 	public String getImageSheet(){
@@ -105,13 +118,27 @@ public enum EnumUnitItems {
 	}
 	
 	public boolean isShield(){
-		return this == IronShield || this == GoldShield || this == DiamondShield;
+		return this == IronShieldPaint || this == GoldShieldPaint || this == DiamondShieldPaint 
+				||this == HideShield || this == HideShiedPaint || this == WoodShield;
+	}
+	
+	public boolean isJabAttack(){
+		return this == WoodSpear || this == StoneSpear || this == IronSpear || this == DiamondSpear || 
+				this == GoldSpear || this == IronHalberard || this == IronGlaive  || this == PitchFork;
 	}
 	
 	public int getShieldForTeam(int team){
-		if(this.isShield())
+		if(this.isShield() && colour)
 			return this.index+team;
 		else
 			return index;
+	}
+
+	public int getTrim() {
+		return trim;
+	}
+
+	public int getBack() {
+		return back;
 	}	
 }

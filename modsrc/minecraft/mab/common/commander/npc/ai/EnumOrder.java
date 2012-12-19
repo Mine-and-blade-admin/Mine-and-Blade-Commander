@@ -7,7 +7,16 @@ import net.minecraft.src.StringTranslate;
 public enum EnumOrder {
 	
 	StandGuard("order.stand_guard"),
-	Follow("order.follow");
+	Follow("order.follow"), 
+	Details("order.details"), 
+	Upgrade("order.upgrade"),
+	GoTo("order.goto"),
+	GoToSelect("order.goto.select"),
+	GoToCancel("order.goto.cancel"),
+	TargetDist("order.targetDist"),
+	TargetNormal("order.target.normal"),
+	TargetNear("order.tagert.near"),
+	TargetNone("order.tagert.none");
 	
 	private String label;
 	private static StringTranslate st = StringTranslate.getInstance();

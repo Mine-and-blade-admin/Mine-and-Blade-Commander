@@ -10,6 +10,7 @@ import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.World;
 import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 public class CommonProxy implements IGuiHandler{
 
@@ -113,13 +114,21 @@ public class CommonProxy implements IGuiHandler{
 		return required;
 	}
 
-	public void resetSelectedUnits() {
+	public void resetSelectedUnits() {}
+
+	public List<EntityMBUnit> getSelectedUnits() {
+		return null;
+	}
+
+	public void reparseOrderGUIOptions() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public List<EntityMBUnit> getSelectedUnits() {
-		return null;
+	public void selectAllUnitsAround(List<EntityMBUnit> surrounded, EntityPlayer player) {}
+
+	public void registerPlayerTracker() {
+		GameRegistry.registerPlayerTracker(new MBPlayerTracker());		
 	}
 
 }
